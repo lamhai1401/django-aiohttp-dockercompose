@@ -1,0 +1,32 @@
+version: '3.3'
+
+services:
+  web:
+    build: .
+    command:  bash -c "chmod +x ./run.sh && ./run.sh"
+    container_name: aio_movies
+    volumes:
+      - .:/aio_movies
+    ports: 
+      - "8000:8000"
+  
+  nginx:
+    build: ./nginx
+    container_name: ng_server
+    depends_on:
+      - web
+    command: nginx -g 'daemon off;'
+    ports:
+      - "81:81"
+    volumes:
+      - ./static:/var/www/static
+  
+  redis:
+    build: ./redis
+    container_name: redis_server
+    depends_on:
+      - web
+    ports:
+      - "6379:6379"
+
+# docker-compose down -v --rmi all --remove-orphans (remove all docker compose)
